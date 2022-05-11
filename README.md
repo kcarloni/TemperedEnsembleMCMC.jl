@@ -3,8 +3,12 @@
 A (fast) implementation of parallel-tempered, ensemble MCMC.
 Currently unregistered.
 
-
 At the moment, the following are implemented:
+
+    Sampling values of additional observables:
+	- These should be packaged into a second output of 
+	  the user's 'log_pdf' function, ie. 
+	  'log_pdf(x)::(lp::Float64, obs::Vector{Float64})'
 
     Proposal Moves:
         - Ensemble "Stretch" Move (GW10)
@@ -12,12 +16,18 @@ At the moment, the following are implemented:
     Parallel Tempering Schemes:
         - Fixed ladder of exponentially scaling temps, 
 	  T = [1, dT^1, dT^2, ...]
-          for user-input ladder size (ntemps) and dT (dtemps).
+          for user-input ladder size (`ntemps`) and dT (`dtemps`).
         - Control of the overall likelihood of proposing
           temperature swaps at any step via
-          "prob_propose_swap"; default = 0.1. 
+          `prob_propose_swap`; default = 0.1. 
 
     Automatic Multi-Threading using Threads.@threads
+
+While these other options are not yet:
+
+	- Reproducible randomness
+	  (reproducible Julia RNGs are not thread-safe)
+	- Adaptive temperature scaling 
 
 For example, to sample from Rosenbrock's banana function (2d), 
 
@@ -48,7 +58,8 @@ julia> out = TemperedEnsembleMCMC.run(
 	ntemps=2, dtemp=dtemp,
 	save_observables=false)
 
-julia> x, accepted, nswaps_accepted, nswaps_proposed, log_probs, obs = out
+julia> x, accepted, nswaps_accepted, nswaps_proposed, 
+	log_probs, obs = out
 
 # reshape the output "x" to (nsamples, ndim)
 julia> samples = reduce(vcat, reduce(vcat, x)')
@@ -60,6 +71,8 @@ julia> histogram2d(
 	show_empty=true, bins=200, c=cgrad(:blues)
 )
 ```
+
+We can benchmark serial performance:
 
 ```julia
 julia> using BenchmarkTools
@@ -79,8 +92,14 @@ BenchmarkTools.Trial: 7338 samples with 1 evaluation.
 
 ```
 
+and parallel:
+
+
+
 References
 
-Goodman & Weare (2010) 
+Goodman & Weare (2010) https://msp.org/camcos/2010/5-1/camcos-v5-n1-p04-s.pdf
 
+Foreman-Mackey et. al (2011) https://arxiv.org/abs/1202.3665
+emcee: https://github.com/dfm/emcee
 
