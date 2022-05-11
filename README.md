@@ -17,7 +17,10 @@ At the moment, the following are implemented:
         - Fixed ladder of exponentially scaling temps, 
 	  T = [1, dT^1, dT^2, ...]
           for user-input ladder size (`ntemps`) and dT (`dtemps`).
-        - Control of the overall likelihood of proposing
+	- walkers 'w' are distributed to the ladder rungs
+	  by modular arithmetic, ie. the rung 'r' of a walker 
+	  index 'w' is 'r = (w-1) % ntemps'
+        - Users can control of the overall likelihood of proposing
           temperature swaps at any step via
           `prob_propose_swap`; default = 0.1. 
 
@@ -61,8 +64,12 @@ julia> out = TemperedEnsembleMCMC.run(
 julia> x, accepted, nswaps_accepted, nswaps_proposed, 
 	log_probs, obs = out
 
-# reshape the output "x" to (nsamples, ndim)
-julia> samples = reduce(vcat, reduce(vcat, x)')
+# reshape the output to a matrix (ntemps, nwalkers) of (ndim),
+# filter out only the T=1 samples,
+# and then reshape to (nsamples,ndim)
+julia> xx = reduce(vcat, x')
+julia> xx1 = xx[:, [(w-1)%ntemps==0 for w in 1:nwalkers]]
+julia> samples = reduce(vcat, xx1)
 
 # plot!
 julia> using Plots
