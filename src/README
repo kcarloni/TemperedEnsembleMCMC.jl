@@ -1,0 +1,22 @@
+An implementation of parallel-tempered, ensemble MCMC.
+
+At the moment, the following are implemented:
+
+    Proposal Moves:
+        - Ensemble "Stretch" Move (GW10)
+
+    Parallel Tempering Schemes:
+        - Ladder of exponentially scaling temps, T = [1, dT^1, dT^2, ...]
+            for user-input ladder size (ntemps) and dT (dtemps).
+        - Control the overall likelihood of proposing temperature swaps at any step
+            via "prob_propose_swap"; default = 0.1. 
+
+References
+GW10
+
+# to add:
+# - read last SamplerState from saved .hdf5 file
+# - parallelization options! 
+
+# maybe:
+# - calculate integrated_autocorrelation_time
