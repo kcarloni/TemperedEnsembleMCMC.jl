@@ -15,7 +15,7 @@ At the moment, the following are implemented:
 
 For example, to sample from Rosenbrock's banana function (2d), 
 
-'''julia
+```julia
 using TemperedEnsembleMCMC
 log_pdf(x) = -1/20 * (100(x[2]-x[1]^2)^2 + (1-x[1])^2)
 
@@ -50,7 +50,7 @@ histogram2d(
 	samples[:,1], samples[:,2],
 	show_empty=true, bins=200, c=cgrad(:blues)
 )
-'''
+```
 
 
 References
