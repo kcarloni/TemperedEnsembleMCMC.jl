@@ -10,7 +10,7 @@ include("moves.jl")
 #observable_names=["",]
 function run(
     log_pdf, init_samples;
-    nsteps=50, nwalkers=100, seed=123,
+    nsteps=50, nwalkers=100,
     nburnin_steps=0, # not saved!
     ntemps=2, dtemp=1.41, prob_propose_swap=0.1,
     save_observables=false,
@@ -28,8 +28,6 @@ function run(
 
     log_pdf_ = save_observables ? log_pdf : x -> (log_pdf(x), nothing)
 
-    rng = MersenneTwister(seed)
-
     x0 = copy(init_samples)
     tmp = log_pdf_.(init_samples)
     lp0, o0 = getindex.(tmp, 1), getindex.(tmp, 2) 
@@ -41,23 +39,23 @@ function run(
     naccept = zeros(Int, nwalkers) 
     nswaps_p = 0
     nswaps_a = 0
-    perm = randperm(rng, n_per_temp) # allocate once!
+    perm = randperm(n_per_temp) # allocate once!
     wsets = SVector(1:whalf, whalf+1:nwalkers) # divide walkers
 
     for t = 1-nburnin_steps:nsteps # t>0 = save_data
         # propose move...
         propose_move!(
-            x0, o0, lp0, naccept, rng, 
+            x0, o0, lp0, naccept, 
             ntemps, n_per_temp, β,
             perm, wsets, whalf, log_pdf_,
             StretchMove
         )
 
         # propose swap...
-        if rand(rng) < prob_propose_swap
+        if rand() < prob_propose_swap
             nswaps_p += nwalkers-ntemps # skip r=0
             nswaps_a += propose_swap!(
-                (x0, o0, lp0, naccept), rng, 
+                (x0, o0, lp0, naccept), 
                 ntemps, n_per_temp, β, perm
             )
         end
@@ -79,13 +77,13 @@ end
 
 # PARALLEL
 function propose_move!(
-    x0, o0, lp0, naccept, rng, 
+    x0, o0, lp0, naccept, 
     ntemps, n_per_temp, β, 
     perm, wsets, whalf, log_pdf_,
     proposal_type::Type{pT}
 ) where {pT <: OneRefMove}
     # shuffle set of walkers at each temp
-    shuffle!(rng, perm)
+    shuffle!(perm)
     for i=1:2
         Threads.@threads for w0 in wsets[i]
             # index manips to quickly
@@ -109,14 +107,14 @@ function propose_move!(
 
             # - get random k from other half of rung 
             #   by drawing from (1:n_per_temp÷2)-1 and applying transf.
-            kref = 1 + (whalf *(i%2) + ntemps*(rand(rng, 1:n_per_temp÷2)-1)) ÷ ntemps
+            kref = 1 + (whalf *(i%2) + ntemps*(rand(1:n_per_temp÷2)-1)) ÷ ntemps
             wref = (1 + r) + ntemps * (perm[kref]-1)
 
             x1, f = get_proposal(
-                proposal_type, x0[w], x0[wref], rng)
+                proposal_type, x0[w], x0[wref])
             lp1, o1 = log_pdf_(x1)
 
-            if log(rand(rng)) < f + β((w-1)%ntemps) * (lp1-lp0[w])
+            if log(rand()) < f + β((w-1)%ntemps) * (lp1-lp0[w])
                 @inbounds begin
                     naccept[w] += 1
                     x0[w] = x1
@@ -128,20 +126,18 @@ function propose_move!(
     end
 end
 
-
-
-function propose_swap!(state0, rng, ntemps, n_per_temp, β, perm)
+function propose_swap!(state0, ntemps, n_per_temp, β, perm)
     lp0 = state0[3]
     swaps_accepted = 0
     for r in (ntemps-1):-1:1 # skip 0, and go backwards
-        shuffle!(rng, perm)
+        shuffle!(perm)
         dβ = β(r-1) - β(r)
         for k in 1:n_per_temp
             # w(r, k) = (1+r) + (k-1)*ntemps
             w_high = (1+r) + (perm[k]-1)*ntemps # w(r, perm[k])
             w_low = r + (k-1)*ntemps # w(r-1), k
 
-            if log(rand(rng)) < dβ * (lp0[w_high] - lp0[w_low])
+            if log(rand()) < dβ * (lp0[w_high] - lp0[w_low])
                 swaps_accepted += 1
                 for v in state0
                     swap_at!(v, w_high, w_low)
