@@ -77,6 +77,7 @@ function run(
     return x, accept_ratio, nswaps_a, nswaps_p, lp, o   
 end
 
+# PARALLEL
 function propose_move!(
     x0, o0, lp0, naccept, rng, 
     ntemps, n_per_temp, β, 
@@ -86,8 +87,7 @@ function propose_move!(
     # shuffle set of walkers at each temp
     shuffle!(rng, perm)
     for i=1:2
-        # Threads.@threads for w0 in wsets[i]
-        for w0 in wsets[i]
+        Threads.@threads for w0 in wsets[i]
             # index manips to quickly
             # - shuffle each temperature rung
             # - get a random ref walker in the other half of the rung.
@@ -127,6 +127,8 @@ function propose_move!(
         end
     end
 end
+
+
 
 function propose_swap!(state0, rng, ntemps, n_per_temp, β, perm)
     lp0 = state0[3]

@@ -1,4 +1,8 @@
-An (fast) implementation of parallel-tempered, ensemble MCMC.
+
+
+A (fast) implementation of parallel-tempered, ensemble MCMC.
+Currently unregistered.
+
 
 At the moment, the following are implemented:
 
@@ -9,8 +13,8 @@ At the moment, the following are implemented:
         - Fixed ladder of exponentially scaling temps, 
 	  T = [1, dT^1, dT^2, ...]
           for user-input ladder size (ntemps) and dT (dtemps).
-        - Control of the overall likelihood of proposing 
-	  temperature swaps at any step via
+        - Control of the overall likelihood of proposing
+          temperature swaps at any step via
           "prob_propose_swap"; default = 0.1. 
 
     Automatic Multi-Threading using Threads.@threads
@@ -57,6 +61,23 @@ julia> histogram2d(
 )
 ```
 
+```julia
+julia> using BenchmarkTools
+julia> @benchmark TemperedEnsembleMCMC.run(
+	log_pdf, init_samples;
+	nsteps=nsteps, nwalkers=nwalkers, ntemps=2
+)
+
+BenchmarkTools.Trial: 7338 samples with 1 evaluation.
+ Range (min … max):  632.351 μs …   3.058 ms  ┊ GC (min … max): 0.00% … 73.15%
+ Time  (median):     647.424 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   677.091 μs ± 217.372 μs  ┊ GC (mean ± σ):  3.99% ±  9.00%
+
+  █▃                                                            ▁
+  ██▇▆▆▁▁▃▁▄▁█▁▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▃▃▃▄▄▆▇ █
+  632 μs        Histogram: log(frequency) by time       2.33 ms <
+
+```
 
 References
 
