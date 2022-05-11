@@ -78,6 +78,7 @@ julia> histogram2d(
 	show_empty=true, bins=200, c=cgrad(:blues)
 )
 ```
+![banana](banana.svg)
 
 We can benchmark serial performance:
 
@@ -98,9 +99,6 @@ BenchmarkTools.Trial: 7338 samples with 1 evaluation.
   632 μs        Histogram: log(frequency) by time       2.33 ms <
 
 ```
-
-and parallel:
-
 
 
 References
