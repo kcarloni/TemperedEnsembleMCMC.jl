@@ -31,6 +31,9 @@ While these other options are not yet:
 	- Reproducible randomness
 	  (reproducible Julia RNGs are not thread-safe)
 	- Adaptive temperature scaling 
+	- Calculation of any diagnostics, such as the 
+	  integrated autocorrelation -- 
+	  use `MCMCChains.jl`for now. 
 
 For example, to sample from Rosenbrock's banana function (2d), 
 
@@ -88,16 +91,16 @@ nthreads: 1
 nsteps: 100
 nwalkers: 2000
 
-BenchmarkTools.Trial: 47 samples with 1 evaluation.
- Range (min … max):   72.837 ms … 384.786 ms  ┊ GC (min … max):  0.00% … 20.22%
- Time  (median):      86.958 ms               ┊ GC (median):     7.24%
- Time  (mean ± σ):   107.708 ms ±  64.701 ms  ┊ GC (mean ± σ):  10.18% ±  8.61%
+BenchmarkTools.Trial: 138 samples with 1 evaluation.
+ Range (min … max):  27.029 ms … 119.866 ms  ┊ GC (min … max):  0.00% … 68.95%
+ Time  (median):     35.333 ms               ┊ GC (median):    11.77%
+ Time  (mean ± σ):   36.375 ms ±  11.187 ms  ┊ GC (mean ± σ):  16.31% ± 13.40%
 
-   █▆
-  ▆██▇▅▅▁▁▁▁▃▁▁▃▃▁▃▁▃▁▁▁▁▁▁▁▁▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▄ ▁
-  72.8 ms          Histogram: frequency by time          385 ms <
+   ▁ ▁   ▁█
+  ▇█▇██▅▆██▆▂▂▁▁▂▁▁▂▁▁▁▂▁▁▁▁▁▁▁▁▁▁▂▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▂ ▂
+  27 ms           Histogram: frequency by time          111 ms <
 
- Memory estimate: 28.56 MiB, allocs estimate: 443210.
+ Memory estimate: 25.29 MiB, allocs estimate: 230881.
 ```
 
 and parallel:
