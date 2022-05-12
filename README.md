@@ -80,26 +80,46 @@ julia> histogram2d(
 ```
 ![banana](banana.svg)
 
-We can benchmark serial performance:
+We can benchmark serial performance `using BenchmarkTools`
 
 ```julia
-julia> using BenchmarkTools
-julia> @benchmark TemperedEnsembleMCMC.run(
-	log_pdf, init_samples;
-	nsteps=nsteps, nwalkers=nwalkers, ntemps=2
-)
+nthreads: 1
 
-BenchmarkTools.Trial: 7338 samples with 1 evaluation.
- Range (min … max):  632.351 μs …   3.058 ms  ┊ GC (min … max): 0.00% … 73.15%
- Time  (median):     647.424 μs               ┊ GC (median):    0.00%
- Time  (mean ± σ):   677.091 μs ± 217.372 μs  ┊ GC (mean ± σ):  3.99% ±  9.00%
+nsteps: 100
+nwalkers: 2000
 
-  █▃                                                            ▁
-  ██▇▆▆▁▁▃▁▄▁█▁▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▃▃▃▄▄▆▇ █
-  632 μs        Histogram: log(frequency) by time       2.33 ms <
+BenchmarkTools.Trial: 47 samples with 1 evaluation.
+ Range (min … max):   72.837 ms … 384.786 ms  ┊ GC (min … max):  0.00% … 20.22%
+ Time  (median):      86.958 ms               ┊ GC (median):     7.24%
+ Time  (mean ± σ):   107.708 ms ±  64.701 ms  ┊ GC (mean ± σ):  10.18% ±  8.61%
 
+   █▆
+  ▆██▇▅▅▁▁▁▁▃▁▁▃▃▁▃▁▃▁▁▁▁▁▁▁▁▃▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▄ ▁
+  72.8 ms          Histogram: frequency by time          385 ms <
+
+ Memory estimate: 28.56 MiB, allocs estimate: 443210.
 ```
 
+and parallel:
+
+```julia
+nthreads: 4
+
+nsteps: 100
+nwalkers: 2000
+
+BenchmarkTools.Trial: 260 samples with 1 evaluation.
+ Range (min … max):  13.725 ms … 100.325 ms  ┊ GC (min … max):  0.00% … 82.18%
+ Time  (median):     15.783 ms               ┊ GC (median):     0.00%
+ Time  (mean ± σ):   19.283 ms ±   8.432 ms  ┊ GC (mean ± σ):  17.79% ± 17.80%
+
+    █▇█▄▄
+  ▃▆██████▅▄▂▂▂▂▃▁▂▁▁▁▂▁▁▁▁▂▁▂▂▃▄▃▅▅▄▆▄▂▃▃▃▃▄▄▆▂▄▁▁▁▁▁▁▁▁▁▂▁▁▂ ▃
+  13.7 ms         Histogram: frequency by time         33.6 ms <
+
+ Memory estimate: 25.72 MiB, allocs estimate: 233965.
+
+```
 
 References
 

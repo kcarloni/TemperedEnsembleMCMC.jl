@@ -7,15 +7,14 @@ function init_output_vector(v0s, nsamples)
 end
 init_output_vector(v0s::Nothing, nsamples) = nothing
 
+# nouter = nsteps, ninner = nwalkers
 init_output_vector_of_vector(
     v0s, nouter, ninner, 
-    init_fn=init_output_vector) =
-    [init_fn(v0s[i], ninner) for i=1:nouter]
+    init_fn=init_output_vector) = [init_fn(v0s[1], ninner) for i=1:nouter]
 
 init_output_vector_of_vector(
     v0s::Vector{Nothing}, nouter, ninner,
     init_fn=init_output_vector) = nothing
-
 
 # convience swap function 
 function swap_at!(vec, i1::Int, i2::Int)

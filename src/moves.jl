@@ -13,8 +13,7 @@ Base.@kwdef struct StretchMove <: OneRefMove end
 
 function get_proposal( # StretchMove 
     proposal_type::Type{T},
-    old_sample::Vector{Float64},
-    ref_sample::Vector{Float64}, a=2,
+    old_sample, ref_sample, a=2,
     # c_set::Matrix{Float64},
     ) where (T<:StretchMove)
 
