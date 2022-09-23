@@ -58,7 +58,7 @@ julia> nburnin_steps = 20
 julia> save_observables = false
 
 julia> out = TemperedEnsembleMCMC.run(
-	log_pdf, samples_0;
+	log_pdf, init_samples;
 	nsteps=nsteps, nwalkers=nwalkers, 
 	nburnin_steps=20
 	ntemps=2, dtemp=dtemp,
